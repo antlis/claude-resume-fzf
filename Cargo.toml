@@ -1,6 +1,6 @@
 [package]
 name = "claude-resume-fzf"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Fuzzy-find and resume Claude Code sessions across all project folders"
 license = "MIT"

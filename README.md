@@ -37,8 +37,8 @@ session and it drops you into the right directory and resumes it for you.
 ## Features
 
 - 🔎 **Global search** — every session across every project, newest first.
-- ⌨️ **Fuzzy find** by directory *or* the first prompt of each session.
-- 👁️ **Live preview** — read the actual conversation before you commit to resuming.
+- ⌨️ **Fuzzy find** by title and directory — or the *entire transcript* with `-a`.
+- 👁️ **Live preview** — read the actual conversation, with your query highlighted.
 - 🚀 **Zero-config** — reads Claude Code's own session files; nothing to set up.
 - 🦀 **Fast & tiny** — single static-ish Rust binary, one dependency.
 
@@ -63,15 +63,19 @@ Both install two binaries: `claude-resume-fzf` and the short alias **`ccresume`*
 ## Usage
 
 ```sh
-ccresume
+ccresume          # search by title + directory (default)
+ccresume -a       # also fuzzy-search the full conversation transcript
 ```
 
-- **Type** to fuzzy-search by directory or prompt text.
-- The **preview pane** shows the conversation for the highlighted session.
+- **Type** to fuzzy-search. By default this matches each session's title (the one
+  Claude generates) and its directory.
+- Pass **`-a`** / **`--all`** to also search everything ever said in the session —
+  your prompts and Claude's replies. Handy when you remember *what* you discussed
+  but not the title (e.g. "that time I was messing with `yazi`").
+- The **preview pane** shows the conversation for the highlighted session, with
+  your search terms highlighted.
 - **`Enter`** — `cd` into the session's directory and run `claude --resume <id>`.
 - **`Esc`** — quit, do nothing.
-
-That's it. No flags, no config file.
 
 ## Requirements
 
@@ -82,12 +86,16 @@ That's it. No flags, no config file.
 ## How it works
 
 1. Scans `~/.claude/projects/*/*.jsonl`.
-2. For each session file, extracts the working directory, the first real user
-   prompt, and the last-modified time.
+2. For each session file, extracts the working directory, Claude's generated
+   title (falling back to the first user prompt), and the last-modified time.
+   Sessions with no recorded `cwd` fall back to decoding the folder name, but only
+   if that path still exists.
 3. Feeds a formatted, tab-delimited list into `fzf`; hidden columns carry the raw
-   `cwd`, session id, and file path.
-4. The preview pane is rendered by re-invoking the binary (`--preview <file>`),
-   which pretty-prints the conversation turns.
+   `cwd`, session id, and file path. With `-a`, a flattened transcript blob is
+   appended off-screen so `fzf` searches the whole conversation.
+4. The preview pane is rendered by re-invoking the binary
+   (`--preview <file> <query>`), which pretty-prints the conversation turns and
+   highlights the current search terms.
 5. On selection it `chdir`s to the session's directory and `exec`s
    `claude --resume <id>`, replacing itself with Claude Code.
 
