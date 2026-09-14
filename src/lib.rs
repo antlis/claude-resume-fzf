@@ -297,6 +297,9 @@ pub fn run(full: bool) -> ! {
             "--layout=reverse",
             "--preview-window=down:60%:wrap",
         ])
+        // Fuzzy matching over a 20 KB transcript blob matches almost everything,
+        // so full-text mode uses exact substring matching instead.
+        .args(if full { &["--exact"][..] } else { &[][..] })
         .arg("--preview")
         .arg(&preview_cmd)
         .stdin(Stdio::piped())
@@ -506,7 +509,7 @@ pub fn main_with_args(args: Vec<String>) -> ! {
                  Select one to cd into its directory and run `claude --resume`.\n\
                  Search matches the session title and directory by default.\n\n\
                  Options:\n\
-                 \x20 -a, --all     also fuzzy-search the full conversation transcript\n\
+                 \x20 -a, --all     also search the full transcript (exact substring match)\n\
                  \x20 -h, --help    show this help and exit\n\n\
                  Keys (inside fzf):\n\
                  \x20 Enter         resume the selected session in its directory\n\

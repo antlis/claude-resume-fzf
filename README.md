@@ -71,7 +71,9 @@ ccresume -a       # also fuzzy-search the full conversation transcript
   Claude generates) and its directory.
 - Pass **`-a`** / **`--all`** to also search everything ever said in the session —
   your prompts and Claude's replies. Handy when you remember *what* you discussed
-  but not the title (e.g. "that time I was messing with `yazi`").
+  but not the title (e.g. "that time I was messing with `yazi`"). To keep results
+  meaningful over long transcripts, this mode matches the query as an **exact
+  substring** (fuzzy matching would match almost every session).
 - The **preview pane** shows the conversation for the highlighted session, with
   your search terms highlighted.
 - **`Enter`** — `cd` into the session's directory and run `claude --resume <id>`.
