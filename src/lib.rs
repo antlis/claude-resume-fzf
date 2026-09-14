@@ -197,7 +197,7 @@ fn collect_sessions() -> Vec<Session> {
             }
         }
     }
-    sessions.sort_by(|a, b| b.mtime.cmp(&a.mtime));
+    sessions.sort_by_key(|s| std::cmp::Reverse(s.mtime));
     sessions
 }
 
