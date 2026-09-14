@@ -13,14 +13,11 @@ struct Session {
     cwd: String,
     /// Best label: Claude's AI-generated title, else the first user prompt.
     label: String,
-    /// Flattened, capped transcript text (prompts + replies) for fuzzy search.
+    /// Flattened transcript text (prompts + replies) for full-text search.
     haystack: String,
     mtime: u64,
     file: PathBuf,
 }
-
-/// Max bytes of transcript text kept per session for the search haystack.
-const HAYSTACK_CAP: usize = 20_000;
 
 fn home() -> PathBuf {
     PathBuf::from(std::env::var("HOME").expect("HOME not set"))
@@ -162,13 +159,10 @@ fn is_sidechain(v: &Value) -> bool {
     v.get("isSidechain").and_then(Value::as_bool) == Some(true)
 }
 
-/// Append whitespace-flattened text to the search haystack, up to `HAYSTACK_CAP`.
-/// Flattening drops tabs/newlines so the blob stays on one fzf record.
+/// Append whitespace-flattened text to the search haystack. Flattening drops
+/// tabs/newlines so the whole transcript stays on one fzf record.
 fn append_haystack(hay: &mut String, text: &str) {
     for word in text.split_whitespace() {
-        if hay.len() >= HAYSTACK_CAP {
-            return;
-        }
         hay.push_str(word);
         hay.push(' ');
     }
