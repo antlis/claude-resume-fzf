@@ -1,0 +1,28 @@
+[package]
+name = "claude-resume-fzf"
+version = "0.1.0"
+edition = "2021"
+description = "Fuzzy-find and resume Claude Code sessions across all project folders"
+license = "MIT"
+repository = "https://github.com/antlis/claude-resume-fzf"
+readme = "README.md"
+keywords = ["claude", "fzf", "cli", "sessions", "resume"]
+categories = ["command-line-utilities"]
+
+[lib]
+name = "claude_resume_fzf"
+path = "src/lib.rs"
+
+[[bin]]
+name = "claude-resume-fzf"
+path = "src/main.rs"
+
+[[bin]]
+name = "ccresume"
+path = "src/bin/ccresume.rs"
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+strip = true
