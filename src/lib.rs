@@ -77,7 +77,8 @@ fn text_from_content(content: &Value) -> Option<String> {
 }
 
 /// Read a session file, pulling out cwd and the first real user prompt.
-fn parse_session(file: PathBuf) -> Option<Session> {
+/// The full transcript haystack is only built when `full` search is requested.
+fn parse_session(file: PathBuf, full: bool) -> Option<Session> {
     let id = file.file_stem()?.to_string_lossy().into_owned();
     let mtime = fs::metadata(&file)
         .ok()
@@ -125,7 +126,9 @@ fn parse_session(file: PathBuf) -> Option<Session> {
                             if ty == "user" && prompt.is_none() {
                                 prompt = Some(t.to_string());
                             }
-                            append_haystack(&mut haystack, t);
+                            if full {
+                                append_haystack(&mut haystack, t);
+                            }
                         }
                     }
                 }
@@ -168,7 +171,7 @@ fn append_haystack(hay: &mut String, text: &str) {
     }
 }
 
-fn collect_sessions() -> Vec<Session> {
+fn collect_sessions(full: bool) -> Vec<Session> {
     let mut sessions = Vec::new();
     let dir = projects_dir();
     let entries = match fs::read_dir(&dir) {
@@ -184,7 +187,7 @@ fn collect_sessions() -> Vec<Session> {
             for f in files.flatten() {
                 let fp = f.path();
                 if fp.extension().and_then(|e| e.to_str()) == Some("jsonl") {
-                    if let Some(s) = parse_session(fp) {
+                    if let Some(s) = parse_session(fp, full) {
                         sessions.push(s);
                     }
                 }
@@ -238,7 +241,7 @@ const RESET: &str = "\x1b[0m";
 /// When `full` is set, the whole transcript is searchable; otherwise fzf
 /// searches only the visible label (title/first prompt) and directory.
 pub fn run(full: bool) -> ! {
-    let sessions = collect_sessions();
+    let sessions = collect_sessions(full);
     if sessions.is_empty() {
         eprintln!(
             "No Claude sessions found under {}",
@@ -583,10 +586,15 @@ mod tests {
         .join("\n");
         fs::write(&file, body).unwrap();
 
-        let s = parse_session(file).expect("session parsed");
+        let s = parse_session(file.clone(), true).expect("session parsed");
         assert_eq!(s.label, "Fix the login bug");
         assert_eq!(s.cwd, "/tmp");
         assert_eq!(s.id, "11111111-2222-3333-4444-555555555555");
+        assert!(s.haystack.contains("first prompt here"));
+
+        // Default (non-full) mode skips building the haystack.
+        let s = parse_session(file, false).expect("session parsed");
+        assert!(s.haystack.is_empty());
 
         fs::remove_dir_all(&dir).ok();
     }
