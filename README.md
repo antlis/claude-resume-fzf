@@ -2,6 +2,7 @@
 
 > Jump back into any Claude Code session, from anywhere, in two keystrokes.
 
+[![crates.io](https://img.shields.io/crates/v/claude-resume-fzf.svg)](https://crates.io/crates/claude-resume-fzf)
 [![Rust](https://img.shields.io/badge/built%20with-Rust-000000?logo=rust)](https://www.rust-lang.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -44,13 +45,19 @@ session and it drops you into the right directory and resumes it for you.
 
 ## Install
 
-From source (requires a Rust toolchain):
+From [crates.io](https://crates.io/crates/claude-resume-fzf) (requires a Rust toolchain):
+
+```sh
+cargo install claude-resume-fzf
+```
+
+Or straight from the latest git:
 
 ```sh
 cargo install --git https://github.com/antlis/claude-resume-fzf
 ```
 
-Or clone and build:
+Or clone and build locally:
 
 ```sh
 git clone https://github.com/antlis/claude-resume-fzf
@@ -58,7 +65,7 @@ cd claude-resume-fzf
 cargo install --path .
 ```
 
-Both install two binaries: `claude-resume-fzf` and the short alias **`ccresume`**.
+All install two binaries: `claude-resume-fzf` and the short alias **`ccresume`**.
 
 ## Usage
 
